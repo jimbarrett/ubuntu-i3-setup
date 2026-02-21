@@ -56,7 +56,7 @@ get_username() {
 		msg "Configuring for user: $username"
 	else
 		echo "Enter the username to configure:"
-		read -r username
+		read -r username < /dev/tty
 		id "$username" >/dev/null 2>&1 || error "User '$username' does not exist."
 	fi
 
@@ -258,7 +258,7 @@ echo ""
 echo "Ready to begin? (y/n)"
 
 while true; do
-	read -r answer
+	read -r answer < /dev/tty
 	case $answer in
 		[Yy]*) break ;;
 		[Nn]*) error "User exited." ;;
