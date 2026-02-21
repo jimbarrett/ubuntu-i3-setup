@@ -277,7 +277,8 @@ deploy_dotfiles() {
 	cp -rfT "$tmpdir/configs" "$userhome"
 	chmod +x "$userhome/.local/bin/i3blocks/"* 2>/dev/null || true
 	chmod +x "$userhome/.xinitrc" 2>/dev/null || true
-	chown -R "$username":"$username" "$userhome/.config" "$userhome/.local" "$userhome/.Xresources" "$userhome/.xinitrc"
+	mkdir -p "$userhome/.screenlayout"
+	chown -R "$username":"$username" "$userhome/.config" "$userhome/.local" "$userhome/.Xresources" "$userhome/.xinitrc" "$userhome/.screenlayout"
 
 	rm -rf "$tmpdir"
 	msg "Dotfiles deployed."
@@ -309,6 +310,16 @@ set_shell() {
 		fi
 	else
 		msg "zsh is already the default shell."
+	fi
+}
+
+disable_autorandr_service() {
+	# autorandr's systemd service causes monitor flickering on thunderbolt docks
+	# by repeatedly re-applying display profiles. we use manual layout switching instead.
+	if systemctl list-unit-files autorandr.service >/dev/null 2>&1; then
+		msg "Disabling autorandr systemd service..."
+		systemctl disable autorandr.service 2>/dev/null || true
+		systemctl stop autorandr.service 2>/dev/null || true
 	fi
 }
 
@@ -389,6 +400,7 @@ run_step "VS Code"         install_vscode
 run_step "Starship prompt" install_starship
 run_step "cursor config"   configure_cursor
 run_step "set zsh shell"   set_shell
+disable_autorandr_service
 disable_system_beep
 rebuild_font_cache
 
