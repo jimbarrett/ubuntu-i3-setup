@@ -121,6 +121,18 @@ configure_lightdm() {
 	systemctl disable gdm3 2>/dev/null || true
 	systemctl daemon-reload
 
+	# configure greeter: dark background, gruvbox theme
+	local greeter_conf="/etc/lightdm/lightdm-gtk-greeter.conf"
+	if [ -f "$greeter_conf" ]; then
+		sed -i '/^\[greeter\]/,/^\[/{
+			s/^#\?background=.*/background=#282828/
+			s/^#\?user-background=.*/user-background=false/
+			s/^#\?theme-name=.*/theme-name=Adwaita-dark/
+			s/^#\?icon-theme-name=.*/icon-theme-name=Papirus-Dark/
+			s/^#\?font-name=.*/font-name=Hack Nerd Font 10/
+		}' "$greeter_conf"
+	fi
+
 	msg "lightdm configured."
 }
 
