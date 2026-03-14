@@ -36,6 +36,7 @@
 ,ffmpeg,"handles video and audio processing."
 ,network-manager,"manages network connections."
 ,network-manager-gnome,"provides the network tray applet."
+,blueman,"is the bluetooth manager and pairing agent."
 ,openvpn,"is a VPN client."
 ,firefox,"is the web browser."
 ,mpv,"is a video player."

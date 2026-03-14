@@ -273,6 +273,30 @@ install_starship() {
 	fi
 }
 
+install_launcher() {
+	msg "Installing launcher..."
+
+	local bin_dir="$userhome/.local/bin"
+	mkdir -p "$bin_dir"
+
+	local arch
+	arch=$(uname -m)
+	case "$arch" in
+		x86_64)  arch="amd64" ;;
+		aarch64) arch="arm64" ;;
+		*) warn "Unsupported architecture: $arch"; return 1 ;;
+	esac
+
+	local url="https://github.com/jimbarrett/launcher/releases/latest/download/launcher_linux_${arch}"
+	if ! curl -fsSL "$url" -o "$bin_dir/launcher"; then
+		warn "Failed to download launcher binary."
+		return 1
+	fi
+
+	chmod +x "$bin_dir/launcher"
+	chown "$username":"$username" "$bin_dir/launcher"
+}
+
 deploy_dotfiles() {
 	msg "Deploying dotfiles..."
 
@@ -404,6 +428,7 @@ msg "Starting installation..."
 system_update
 install_packages
 run_step "lightdm config"  configure_lightdm
+run_step "launcher"        install_launcher
 run_step "dotfiles"        deploy_dotfiles
 run_step "Hack Nerd Font"  install_nerd_font
 run_step "nvm"             install_nvm
