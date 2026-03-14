@@ -287,7 +287,18 @@ install_launcher() {
 		*) warn "Unsupported architecture: $arch"; return 1 ;;
 	esac
 
-	local url="https://github.com/jimbarrett/launcher/releases/latest/download/launcher_linux_${arch}"
+	local suffix="linux_${arch}"
+	local url
+	url=$(curl -fsSL https://api.github.com/repos/jimbarrett/launcher/releases/latest \
+		| grep -o "\"browser_download_url\": *\"[^\"]*${suffix}\"" \
+		| head -1 \
+		| cut -d'"' -f4)
+
+	if [ -z "$url" ]; then
+		warn "Could not find launcher binary for $suffix."
+		return 1
+	fi
+
 	if ! curl -fsSL "$url" -o "$bin_dir/launcher"; then
 		warn "Failed to download launcher binary."
 		return 1
